@@ -223,6 +223,10 @@ func main() {
 	cookieGroup := e.Group("/cookie")
 	jwtGroup := e.Group("/jwt")
 
+	// Disable static page serving
+	// Remove binary from public web access
+	// e.Use(middleware.Static("./"))
+
 	// Log the server interaction
 	adminGroup.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
 		Format: `[${time_rfc3339}] ${status} ${method} ${host}${path} ${latency_human}` + "\n",
@@ -249,7 +253,7 @@ func main() {
 	cookieGroup.GET("/main", mainCookie)
 	jwtGroup.GET("/main", mainJwt)
 
-	e.GET("/", renderHome)
+	e.GET("/home", renderHome)
 	e.GET("/login", login)
 	e.GET("/users/:data", getUser)
 
