@@ -14,7 +14,26 @@ type JwtClaims struct {
 	jwt.StandardClaims
 }
 
-func login(c echo.Context) error {
+func createJwtToken() (string, error) {
+	claims := JwtClaims{
+		"fode",
+		jwt.StandardClaims{
+			Id:        "main_user_id",
+			ExpiresAt: time.Now().Add(24 * time.Hour).Unix(),
+		},
+	}
+
+	rawToken := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
+
+	token, err := rawToken.SignedString([]byte("Not_So_Secret"))
+	if err != nil {
+		return "", err
+	}
+
+	return token, nil
+}
+
+func Login(c echo.Context) error {
 	username := c.QueryParam("username")
 	password := c.QueryParam("password")
 
