@@ -117,6 +117,12 @@ func mainCookie(c echo.Context) error {
 }
 
 func mainJwt(c echo.Context) error {
+	user := c.Get("user")
+	token := user.(*jwt.Token)
+	claims := token.Claims.(jwt.MapClaims)
+
+	log.Println("Username: ", claims["name"], "User ID: ", claims["jti"])
+
 	return c.String(http.StatusOK, "You are on the correct JWT page!")
 }
 
