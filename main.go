@@ -116,6 +116,10 @@ func mainCookie(c echo.Context) error {
 	return c.String(http.StatusOK, "You are on the clear cookie page.")
 }
 
+func mainJwt(c echo.Context) error {
+	return c.String(http.StatusOK, "You are on the correct JWT page!")
+}
+
 func login(c echo.Context) error {
 	username := c.QueryParam("username")
 	password := c.QueryParam("password")
@@ -157,7 +161,7 @@ func createJwtToken() (string, error) {
 
 	rawToken := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
 
-	token, err := rawToken.SignedString([]byte("SECRET_STRING"))
+	token, err := rawToken.SignedString([]byte("Not_So_Secret"))
 	if err != nil {
 		return "", err
 	}
@@ -203,6 +207,7 @@ func main() {
 
 	adminGroup := e.Group("/admin")
 	cookieGroup := e.Group("/cookie")
+	jwtGroup := e.Group("/jwt")
 
 	// Log the server interaction
 	adminGroup.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
@@ -218,10 +223,16 @@ func main() {
 		return false, nil
 	}))
 
+	jwtGroup.Use(middleware.JWTWithConfig(middleware.JWTConfig{
+		SigningMethod: "HS512",
+		SigningKey:    []byte("Not_So_Secret"),
+	}))
+
 	cookieGroup.Use(checkCookie)
 
 	adminGroup.GET("/main", getMainAdmin)
 	cookieGroup.GET("/main", mainCookie)
+	jwtGroup.GET("/main", mainJwt)
 
 	e.GET("/", renderHome)
 	e.GET("/login", login)
